@@ -1,11 +1,11 @@
 package com.snippetia.di
 
 import com.snippetia.data.api.*
-import com.snippetia.data.network.createHttpClient
+import com.snippetia.data.network.HttpClientFactory
 import com.snippetia.data.repository.*
+import com.snippetia.data.storage.*
 import com.snippetia.domain.usecase.*
 import com.snippetia.presentation.viewmodel.*
-import kotlinx.coroutines.runBlocking
 import org.koin.dsl.module
 
 val appModule = module {
@@ -14,8 +14,8 @@ val appModule = module {
     
     // Network
     single { 
-        createHttpClient { 
-            get<TokenStorage>().getToken() 
+        HttpClientFactory.create { 
+            runBlocking { get<TokenStorage>().getToken() }
         } 
     }
     single { ApiClient(get()) }

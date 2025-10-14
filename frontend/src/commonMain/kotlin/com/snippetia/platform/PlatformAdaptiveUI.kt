@@ -43,10 +43,9 @@ data class ScreenConfiguration(
 fun rememberScreenConfiguration(): ScreenConfiguration {
     val density = LocalDensity.current
     
-    // Get screen dimensions
-    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
-    val screenHeight = configuration.screenHeightDp.dp
+    // Get screen dimensions - simplified for cross-platform compatibility
+    val screenWidth = 1200.dp // Default desktop width
+    val screenHeight = 800.dp // Default desktop height
     
     // Determine form factor based on screen size and characteristics
     val formFactor = when {

@@ -53,7 +53,6 @@ class ObjectPool<T>(
 // GPU-Accelerated Shader Effects
 @Composable
 fun GPUAcceleratedShader(
-    shader: RuntimeShader,
     modifier: Modifier = Modifier,
     animationSpec: AnimationSpec<Float> = infiniteRepeatable(
         animation = tween(2000, easing = LinearEasing),
@@ -67,56 +66,59 @@ fun GPUAcceleratedShader(
         label = "time"
     )
     
-    Canvas(
-        modifier = modifier.drawWithCache {
-            val paint = Paint().apply {
-                this.shader = shader.apply {
-                    setFloatUniform("time", time)
-                    setFloatUniform("resolution", size.width, size.height)
-                }
-            }
-            
-            onDrawBehind {
-                drawIntoCanvas { canvas ->
-                    canvas.drawRect(
-                        Rect(Offset.Zero, size),
-                        paint
-                    )
-                }
-            }
-        }
-    ) {}
+    Canvas(modifier = modifier) {
+        // Simplified shader implementation for cross-platform compatibility
+        val gradient = Brush.linearGradient(
+            colors = listOf(
+                Color.Blue.copy(alpha = 0.3f + time * 0.2f),
+                Color.Purple.copy(alpha = 0.5f + time * 0.3f),
+                Color.Cyan.copy(alpha = 0.4f + time * 0.1f)
+            ),
+            start = Offset(0f, 0f),
+            end = Offset(size.width, size.height)
+        )
+        
+        drawRect(
+            brush = gradient,
+            size = size
+        )
+    }
 }
 
-// Advanced Fragment Shader for Code Syntax Highlighting
-val syntaxHighlightShader = RuntimeShader("""
-    uniform float time;
-    uniform float2 resolution;
-    uniform float4 primaryColor;
-    uniform float4 secondaryColor;
-    uniform float4 accentColor;
+// Syntax highlighting shader simulation using Compose gradients
+@Composable
+fun SyntaxHighlightShader(
+    primaryColor: Color,
+    secondaryColor: Color,
+    accentColor: Color,
+    modifier: Modifier = Modifier
+) {
+    val time by rememberInfiniteTransition(label = "syntax_time").animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(3000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "time"
+    )
     
-    float4 main(float2 fragCoord) {
-        float2 uv = fragCoord / resolution.xy;
+    Canvas(modifier = modifier) {
+        val wave = sin(time * 2f * PI) * 0.1f
+        val gradient = Brush.verticalGradient(
+            colors = listOf(
+                primaryColor.copy(alpha = 0.9f + wave),
+                secondaryColor.copy(alpha = 0.7f + wave),
+                accentColor.copy(alpha = 0.3f + wave * 0.5f)
+            )
+        )
         
-        // Create dynamic gradient based on code structure
-        float wave = sin(uv.x * 10.0 + time * 2.0) * 0.1;
-        float gradient = smoothstep(0.0, 1.0, uv.y + wave);
-        
-        // Syntax highlighting colors
-        float4 baseColor = mix(primaryColor, secondaryColor, gradient);
-        
-        // Add subtle animation for active code blocks
-        float pulse = sin(time * 3.0) * 0.1 + 0.9;
-        baseColor.rgb *= pulse;
-        
-        // Add accent highlights for keywords
-        float highlight = step(0.8, sin(uv.x * 20.0 + time));
-        baseColor = mix(baseColor, accentColor, highlight * 0.3);
-        
-        return baseColor;
+        drawRect(
+            brush = gradient,
+            size = size
+        )
     }
-""")
+}
 
 // Particle System for Visual Effects
 class ParticleSystem(

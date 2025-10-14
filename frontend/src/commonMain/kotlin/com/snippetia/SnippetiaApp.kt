@@ -8,9 +8,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.snippetia.presentation.screen.SplashScreen
 import com.snippetia.presentation.theme.SnippetiaTheme
-import com.snippetia.platform.PlatformAdaptiveUI
-import com.snippetia.platform.AdaptiveTheme
-import com.snippetia.platform.rememberScreenConfiguration
+import com.snippetia.platform.*
 import com.snippetia.performance.PerformanceOptimizedContent
 import org.koin.compose.KoinApplication
 
@@ -36,7 +34,7 @@ fun SnippetiaApp() {
         
         AdaptiveTheme(screenConfig = screenConfig) {
             PerformanceOptimizedContent {
-                PlatformAdaptiveUI.AdaptiveLayout {
+                AdaptiveLayout {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
