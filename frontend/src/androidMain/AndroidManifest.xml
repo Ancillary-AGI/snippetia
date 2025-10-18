@@ -1,64 +1,180 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    ===================================================================
+    SNIPPETIA ANDROID MANIFEST
+    ===================================================================
+    
+    This manifest defines the Android application configuration for Snippetia,
+    including permissions, activities, services, and deep link handling.
+    
+    Features:
+    - Network access for API communication
+    - Camera access for code scanning and profile photos
+    - File system access for snippet import/export
+    - Biometric authentication support
+    - Deep link handling for snippet sharing
+    - File provider for secure file sharing
+    
+    Security:
+    - Minimal permission requests for user privacy
+    - Secure file sharing through FileProvider
+    - Biometric authentication integration
+    - Network security configuration
+    
+    Author: Snippetia Team
+    Version: 1.0.0
+    ===================================================================
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- ===== NETWORK PERMISSIONS ===== -->
+    <!-- Required for API communication with backend services -->
     <uses-permission android:name="android.permission.INTERNET" />
+    
+    <!-- Required to check network connectivity status -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- ===== MEDIA PERMISSIONS ===== -->
+    <!-- Required for taking profile photos and scanning QR codes -->
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    
+    <!-- Required for importing code files and snippets (API 32 and below) -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" 
+        android:maxSdkVersion="32" />
+    
+    <!-- Required for exporting snippets and saving files (API 28 and below) -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" 
+        android:maxSdkVersion="28" />
+
+    <!-- ===== BIOMETRIC AUTHENTICATION ===== -->
+    <!-- Legacy fingerprint permission for older devices -->
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+    
+    <!-- Modern biometric authentication (fingerprint, face, etc.) -->
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
+    <!-- ===== APPLICATION CONFIGURATION ===== -->
     <application
         android:name=".SnippetiaApplication"
         android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Snippetia"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:requestLegacyExternalStorage="true"
+        android:preserveLegacyExternalStorage="true">
         
+        <!-- ===== MAIN ACTIVITY ===== -->
+        <!-- Primary application entry point with Compose UI -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Snippetia">
+            android:theme="@style/Theme.Snippetia"
+            android:launchMode="singleTop"
+            android:screenOrientation="unspecified"
+            android:configChanges="orientation|screenSize|keyboardHidden">
+            
+            <!-- Main launcher intent filter -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            
+            <!-- Handle text sharing from other apps -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            
+            <!-- Handle file sharing from other apps -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
         </activity>
         
-        <!-- Deep link handling -->
+        <!-- ===== DEEP LINK HANDLING ===== -->
+        <!-- Handles deep links and universal links for snippet sharing -->
         <activity
             android:name=".DeepLinkActivity"
             android:exported="true"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.Snippetia.Splash">
+            
+            <!-- Universal links (App Links) with domain verification -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Handle snippetia.dev domain links -->
                 <data android:scheme="https"
                     android:host="snippetia.dev" />
             </intent-filter>
+            
+            <!-- Custom URL scheme for app-to-app communication -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Handle snippetia:// custom scheme -->
                 <data android:scheme="snippetia" />
+            </intent-filter>
+            
+            <!-- Handle snippet sharing URLs -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https"
+                    android:host="snippetia.dev"
+                    android:pathPrefix="/snippet/" />
             </intent-filter>
         </activity>
         
-        <!-- File provider for sharing -->
+        <!-- ===== FILE PROVIDER ===== -->
+        <!-- Secure file sharing provider for exporting snippets and attachments -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
+            <!-- File paths configuration for secure access -->
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+        
+        <!-- ===== SERVICES ===== -->
+        <!-- Background sync service for offline functionality -->
+        <service
+            android:name=".service.SyncService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        
+        <!-- Firebase Cloud Messaging service for push notifications -->
+        <service
+            android:name=".service.FirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        
+        <!-- ===== RECEIVERS ===== -->
+        <!-- Network connectivity change receiver -->
+        <receiver
+            android:name=".receiver.NetworkChangeReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
         
     </application>
 
