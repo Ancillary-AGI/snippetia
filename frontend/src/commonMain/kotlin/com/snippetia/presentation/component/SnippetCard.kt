@@ -29,6 +29,53 @@ import com.snippetia.presentation.theme.getLanguageIndicatorColor
 import com.snippetia.presentation.util.formatTimeAgo
 import com.snippetia.presentation.util.formatCount
 
+/**
+ * SnippetCard - Comprehensive code snippet display component
+ * 
+ * This component provides a rich, interactive card interface for displaying code snippets
+ * with full social features, syntax highlighting, and responsive design.
+ * 
+ * Features:
+ * - Interactive snippet preview with expandable content
+ * - Social actions (like, fork, share) with real-time feedback
+ * - User profile integration with avatar and display name
+ * - Language-specific syntax highlighting and badges
+ * - Tag system with overflow handling
+ * - Statistics display (views, likes, forks)
+ * - Responsive design for different screen sizes
+ * - Accessibility support with proper semantics
+ * 
+ * Variants:
+ * - Standard snippet card for general listings
+ * - Featured snippet card with enhanced styling
+ * - Trending snippet card with trend indicators
+ * - Compact card for dense layouts
+ * 
+ * Interactions:
+ * - Click to view full snippet details
+ * - Like/unlike with animated feedback
+ * - Fork snippet for personal use
+ * - Share snippet via platform sharing
+ * - Navigate to user profile
+ * - Expand/collapse code preview
+ * 
+ * @author Snippetia Team
+ * @since 1.0.0
+ */
+
+/**
+ * Standard snippet card with full interactive features
+ * 
+ * @param snippet The code snippet data to display
+ * @param onSnippetClick Callback when the card is clicked to view details
+ * @param onLikeClick Callback when the like button is clicked
+ * @param onForkClick Callback when the fork button is clicked
+ * @param onShareClick Callback when the share button is clicked
+ * @param onUserClick Callback when the user profile is clicked
+ * @param modifier Modifier for styling and layout customization
+ * @param isLiked Whether the current user has liked this snippet
+ * @param showFullContent Whether to show the full code content or preview
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SnippetCard(

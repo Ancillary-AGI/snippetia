@@ -7,20 +7,60 @@ import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
 
+/**
+ * User - Core user entity for the Snippetia platform
+ * 
+ * This entity represents a user account in the system with comprehensive
+ * profile information, security features, and social capabilities.
+ * 
+ * Features:
+ * - Multi-factor authentication support
+ * - OAuth2 integration with external providers
+ * - Account status management and moderation
+ * - Social profile information and links
+ * - Role-based access control (RBAC)
+ * - Account suspension and moderation
+ * - Email verification and password reset
+ * 
+ * Security:
+ * - Password field is excluded from JSON serialization
+ * - Unique constraints on email and username
+ * - Token-based email verification and password reset
+ * - Account status tracking for moderation
+ * - Two-factor authentication support
+ * 
+ * Social Features:
+ * - Display name and avatar customization
+ * - Bio and personal information
+ * - Social media profile links (GitHub, Twitter)
+ * - Website URL for personal branding
+ * 
+ * Audit Trail:
+ * - Automatic creation and update timestamps
+ * - Last login tracking for analytics
+ * - Account status change history
+ * 
+ * @author Snippetia Team
+ * @since 1.0.0
+ */
 @Entity
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener::class)
 data class User(
+    /** Unique identifier for the user */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
+    /** User's email address (unique, used for login and notifications) */
     @Column(unique = true, nullable = false)
     var email: String,
 
+    /** User's unique username (used for @mentions and profile URLs) */
     @Column(unique = true, nullable = false)
     var username: String,
 
+    /** Encrypted password (excluded from JSON serialization for security) */
     @JsonIgnore
     @Column(nullable = false)
     var password: String,

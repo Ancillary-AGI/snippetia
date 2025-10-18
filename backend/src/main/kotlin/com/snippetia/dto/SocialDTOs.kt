@@ -4,24 +4,73 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import java.time.LocalDateTime
 
-// Follow DTOs
+/**
+ * SocialDTOs - Data Transfer Objects for social features and interactions
+ * 
+ * This file contains all DTOs related to social features in the Snippetia platform:
+ * - User following and follower management
+ * - Content starring and favoriting
+ * - Notification system
+ * - Channel subscriptions and monetization
+ * - Developer events and meetups
+ * - Developer showcase and portfolio
+ * - AI bot interactions and assistance
+ * 
+ * Features:
+ * - Comprehensive validation annotations
+ * - Support for real-time social interactions
+ * - Monetization and subscription management
+ * - Event organization and attendance
+ * - Developer networking and showcasing
+ * - AI-powered assistance and code analysis
+ * 
+ * @author Snippetia Team
+ * @since 1.0.0
+ */
+
+// ===== FOLLOW SYSTEM DTOs =====
+/**
+ * Request to follow another user
+ * 
+ * @param userId The ID of the user to follow
+ * @param notificationEnabled Whether to receive notifications from this user
+ */
 data class FollowRequest(
     val userId: Long,
     val notificationEnabled: Boolean = true
 )
 
+/**
+ * Response after following/unfollowing a user
+ * 
+ * @param isFollowing Whether the current user is now following the target user
+ * @param followerCount Updated follower count for the target user
+ * @param followingCount Updated following count for the current user
+ */
 data class FollowResponse(
     val isFollowing: Boolean,
     val followerCount: Long,
     val followingCount: Long
 )
 
+/**
+ * User's follow statistics
+ * 
+ * @param followerCount Number of users following this user
+ * @param followingCount Number of users this user is following
+ */
 data class FollowStatsResponse(
     val followerCount: Long,
     val followingCount: Long
 )
 
-// Star DTOs
+// ===== STAR SYSTEM DTOs =====
+
+/**
+ * Request to star/unstar a snippet
+ * 
+ * @param snippetId The ID of the snippet to star
+ */
 data class StarRequest(
     val snippetId: Long
 )

@@ -1,3 +1,49 @@
+/**
+ * @file svcs.h
+ * @brief SnippetVCS - Advanced Git-like Version Control System
+ * 
+ * SnippetVCS is a high-performance, lightweight version control system
+ * specifically designed for code snippets and small projects. It provides
+ * Git-compatible functionality with optimizations for the unique requirements
+ * of the Snippetia platform.
+ * 
+ * Key Features:
+ * - Git-compatible object model and storage format
+ * - Advanced compression with multiple algorithms
+ * - Cryptographic integrity with SHA-256 hashing
+ * - Atomic operations with ACID compliance
+ * - Multi-threaded operations for performance
+ * - Cross-platform support (Linux, macOS, Windows, FreeBSD)
+ * - Memory-efficient design for embedded systems
+ * - Plugin architecture for extensibility
+ * 
+ * Architecture:
+ * - Object Database: Immutable content-addressed storage
+ * - Index: Staging area for tracking file changes
+ * - References: Branch and tag management
+ * - Compression: Multi-level compression for efficiency
+ * - Diff Engine: Advanced difference detection algorithms
+ * 
+ * Performance Optimizations:
+ * - Delta compression for incremental updates
+ * - Parallel processing for large repositories
+ * - Intelligent caching for frequently accessed objects
+ * - Memory-mapped file I/O for large files
+ * - Lazy loading of repository metadata
+ * 
+ * Security Features:
+ * - SHA-256 cryptographic hashing
+ * - Optional GPG signature verification
+ * - Access control and permission management
+ * - Audit trail for all operations
+ * - Corruption detection and recovery
+ * 
+ * @author Snippetia Team
+ * @version 1.0.0
+ * @since 2024
+ * @copyright MIT License
+ */
+
 #ifndef SVCS_H
 #define SVCS_H
 
@@ -13,24 +59,52 @@
 extern "C" {
 #endif
 
-// Constants
+/**
+ * @defgroup Constants System Constants and Limits
+ * @{
+ */
+
+/** SHA-256 hash size in bytes */
 #define SVCS_HASH_SIZE 32
+
+/** SHA-256 hash size in hexadecimal string format (including null terminator) */
 #define SVCS_HASH_HEX_SIZE 65
+
+/** Maximum path length supported by the system */
 #define SVCS_MAX_PATH 4096
+
+/** Maximum commit message length */
 #define SVCS_MAX_MESSAGE 1024
+
+/** Maximum GPG signature size */
 #define SVCS_SIGNATURE_SIZE 256
 
-// Error codes
+/** @} */
+
+/**
+ * @defgroup ErrorCodes Error Codes and Status Values
+ * @{
+ */
+
+/**
+ * @brief Error codes returned by SVCS functions
+ * 
+ * All SVCS functions return error codes to indicate success or failure.
+ * Positive values indicate success, zero indicates success with no action,
+ * and negative values indicate various error conditions.
+ */
 typedef enum {
-    SVCS_OK = 0,
-    SVCS_ERROR = -1,
-    SVCS_ERROR_NOT_FOUND = -2,
-    SVCS_ERROR_EXISTS = -3,
-    SVCS_ERROR_INVALID = -4,
-    SVCS_ERROR_IO = -5,
-    SVCS_ERROR_MEMORY = -6,
-    SVCS_ERROR_CORRUPT = -7
+    SVCS_OK = 0,                /**< Operation completed successfully */
+    SVCS_ERROR = -1,            /**< General error */
+    SVCS_ERROR_NOT_FOUND = -2,  /**< Requested object or file not found */
+    SVCS_ERROR_EXISTS = -3,     /**< Object or file already exists */
+    SVCS_ERROR_INVALID = -4,    /**< Invalid parameter or data format */
+    SVCS_ERROR_IO = -5,         /**< Input/output error */
+    SVCS_ERROR_MEMORY = -6,     /**< Memory allocation failure */
+    SVCS_ERROR_CORRUPT = -7     /**< Data corruption detected */
 } svcs_error_t;
+
+/** @} */
 
 // Object types
 typedef enum {

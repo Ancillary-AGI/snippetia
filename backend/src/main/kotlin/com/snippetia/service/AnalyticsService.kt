@@ -10,6 +10,39 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
+/**
+ * AnalyticsService - Comprehensive analytics and metrics service
+ * 
+ * This service provides detailed analytics and insights for the Snippetia platform:
+ * - User analytics and engagement metrics
+ * - Platform-wide statistics and trends
+ * - Snippet performance and reach analytics
+ * - Trending content and user discovery
+ * - Growth metrics and KPI tracking
+ * 
+ * Features:
+ * - Real-time analytics data processing
+ * - Time-series data aggregation and analysis
+ * - Geographic and demographic insights
+ * - Engagement rate calculations
+ * - Trend detection and scoring algorithms
+ * - Performance benchmarking and comparisons
+ * 
+ * Analytics Categories:
+ * - User Analytics: Profile views, follower growth, content performance
+ * - Content Analytics: View counts, engagement rates, viral coefficients
+ * - Platform Analytics: User growth, content creation, system health
+ * - Trending Analytics: Hot content, rising users, popular languages
+ * 
+ * Data Sources:
+ * - User interactions (views, likes, follows, shares)
+ * - Content creation and modification events
+ * - System performance and usage metrics
+ * - External referral and traffic data
+ * 
+ * @author Snippetia Team
+ * @since 1.0.0
+ */
 @Service
 @Transactional(readOnly = true)
 class AnalyticsService(
@@ -21,6 +54,16 @@ class AnalyticsService(
     private val repositoryRepository: RepositoryRepository
 ) {
 
+    /**
+     * Get comprehensive analytics for a specific user
+     * 
+     * Provides detailed insights into user activity, content performance,
+     * and engagement metrics over various time periods.
+     * 
+     * @param userId The unique identifier of the user
+     * @return Comprehensive user analytics data
+     * @throws ResourceNotFoundException if user doesn't exist
+     */
     fun getUserAnalytics(userId: Long): UserAnalyticsResponse {
         val user = userRepository.findById(userId)
             .orElseThrow { ResourceNotFoundException("User not found") }

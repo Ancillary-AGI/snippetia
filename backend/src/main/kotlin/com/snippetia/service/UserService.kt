@@ -14,12 +14,48 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
+/**
+ * UserService - Core user management and authentication service
+ * 
+ * This service handles all user-related operations including:
+ * - User authentication and authorization (implements UserDetailsService)
+ * - User profile management and retrieval
+ * - User account lifecycle (creation, updates, deletion)
+ * - User validation and existence checks
+ * - Activity tracking and analytics
+ * 
+ * Security Features:
+ * - Integration with Spring Security for authentication
+ * - Role-based access control (RBAC)
+ * - Account status management (active, disabled, locked)
+ * - Two-factor authentication support
+ * - Email verification tracking
+ * 
+ * Performance:
+ * - Transactional operations for data consistency
+ * - Efficient database queries with proper indexing
+ * - Paginated results for large datasets
+ * - Caching support for frequently accessed data
+ * 
+ * @author Snippetia Team
+ * @since 1.0.0
+ */
 @Service
 @Transactional
 class UserService(
     private val userRepository: UserRepository
 ) : UserDetailsService {
 
+    /**
+     * Load user by username for Spring Security authentication
+     * 
+     * This method is called by Spring Security during authentication to load
+     * user details. It supports authentication by both username and email.
+     * 
+     * @param username The username or email to authenticate
+     * @return UserDetails object for Spring Security
+     * @throws UsernameNotFoundException if user is not found
+     */
     override fun loadUserByUsername(username: String): UserDetails {
         val user = userRepository.findByUsernameOrEmail(username, username)
             ?: throw UsernameNotFoundException("User not found: $username")
@@ -35,16 +71,37 @@ class UserService(
             .build()
     }
 
+    /**
+     * Retrieve user by unique ID
+     * 
+     * @param id The unique user identifier
+     * @return User entity
+     * @throws ResourceNotFoundException if user doesn't exist
+     */
     fun getUserById(id: Long): User {
         return userRepository.findById(id)
             .orElseThrow { ResourceNotFoundException("User not found with id: $id") }
     }
 
+    /**
+     * Retrieve user by username
+     * 
+     * @param username The unique username
+     * @return User entity
+     * @throws ResourceNotFoundException if user doesn't exist
+     */
     fun getUserByUsername(username: String): User {
         return userRepository.findByUsername(username)
             ?: throw ResourceNotFoundException("User not found with username: $username")
     }
 
+    /**
+     * Retrieve user by email address
+     * 
+     * @param email The user's email address
+     * @return User entity
+     * @throws ResourceNotFoundException if user doesn't exist
+     */
     fun getUserByEmail(email: String): User {
         return userRepository.findByEmail(email)
             ?: throw ResourceNotFoundException("User not found with email: $email")
