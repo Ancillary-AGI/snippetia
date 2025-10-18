@@ -238,123 +238,17 @@ data class ShowcaseResponse(
     val skills: List<String>,
     val experienceYears: Int?,
     val createdAt: LocalDateTime
-)Url: String?,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
 )
 
-data class SubscriptionTierResponse(
-    val tier: String,
-    val price: String,
-    val features: List<String>
-)
-
-data class ChannelSummaryResponse(
-    val id: Long,
-    val name: String,
-    val displayName: String,
-    val avatarUrl: String?
-)
-
-// Event DTOs
-data class CreateEventRequest(
-    @field:NotBlank(message = "Event title is required")
-    @field:Size(max = 200, message = "Title must not exceed 200 characters")
-    val title: String,
-
-    @field:NotBlank(message = "Event description is required")
-    @field:Size(max = 2000, message = "Description must not exceed 2000 characters")
-    val description: String,
-
-    val type: String,
-    val startTime: LocalDateTime,
-    val endTime: LocalDateTime,
-    val timezone: String = "UTC",
+data class UpdateEventRequest(
+    val title: String? = null,
+    val description: String? = null,
+    val startTime: LocalDateTime? = null,
+    val endTime: LocalDateTime? = null,
     val location: String? = null,
     val virtualLink: String? = null,
     val maxAttendees: Int? = null,
-    val registrationFee: String? = null,
-    val isFree: Boolean = true,
-    val requiresApproval: Boolean = false,
-    val tags: List<String> = emptyList()
-)
-
-data class EventResponse(
-    val id: Long,
-    val title: String,
-    val description: String,
-    val organizer: UserSummaryResponse?,
-    val channel: ChannelSummaryResponse?,
-    val type: String,
-    val startTime: LocalDateTime,
-    val endTime: LocalDateTime,
-    val timezone: String,
-    val location: String?,
-    val virtualLink: String?,
-    val maxAttendees: Int?,
-    val currentAttendees: Int,
-    val registrationFee: String?,
-    val isFree: Boolean,
-    val requiresApproval: Boolean,
-    val bannerUrl: String?,
-    val tags: List<String>,
-    val status: String,
-    val featured: Boolean,
-    val createdAt: LocalDateTime
-)
-
-// Developer Showcase DTOs
-data class CreateShowcaseRequest(
-    @field:NotBlank(message = "Title is required")
-    @field:Size(max = 200, message = "Title must not exceed 200 characters")
-    val title: String,
-
-    @field:NotBlank(message = "Description is required")
-    @field:Size(max = 2000, message = "Description must not exceed 2000 characters")
-    val description: String,
-
-    @field:NotBlank(message = "App name is required")
-    val appName: String,
-
-    val appUrl: String? = null,
-    val githubUrl: String? = null,
-    val demoUrl: String? = null,
-    val videoUrl: String? = null,
-    val screenshots: List<String> = emptyList(),
-    val technologies: List<String> = emptyList(),
-    val categories: List<String> = emptyList(),
-    val contactEmail: String,
-    val hourlyRate: String? = null,
-    val availableForHire: Boolean = false,
-    val contractTypes: List<String> = emptyList(),
-    val skills: List<String> = emptyList(),
-    val experienceYears: Int? = null
-)
-
-data class ShowcaseResponse(
-    val id: Long,
-    val developer: UserSummaryResponse,
-    val title: String,
-    val description: String,
-    val appName: String,
-    val appUrl: String?,
-    val githubUrl: String?,
-    val demoUrl: String?,
-    val videoUrl: String?,
-    val screenshots: List<String>,
-    val technologies: List<String>,
-    val categories: List<String>,
-    val status: String,
-    val featured: Boolean,
-    val viewCount: Long,
-    val likeCount: Long,
-    val contactEmail: String,
-    val hourlyRate: String?,
-    val availableForHire: Boolean,
-    val contractTypes: List<String>,
-    val skills: List<String>,
-    val experienceYears: Int?,
-    val createdAt: LocalDateTime
+    val tags: List<String>? = null
 )
 
 // AI Bot DTOs
