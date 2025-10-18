@@ -25,6 +25,41 @@ import com.snippetia.presentation.util.formatCount
 import com.snippetia.presentation.util.formatTimeAgo
 import java.time.LocalDateTime
 
+/**
+ * DashboardScreen - Main user dashboard with comprehensive overview
+ * 
+ * This screen serves as the central hub for users, providing:
+ * - Quick statistics and metrics overview
+ * - Recent activity feed and notifications
+ * - Trending content and recommendations
+ * - Quick action shortcuts
+ * - Achievement tracking and gamification
+ * - Analytics insights and performance metrics
+ * 
+ * Features:
+ * - Tabbed interface for different dashboard views
+ * - Real-time data updates and live metrics
+ * - Interactive charts and visualizations
+ * - Personalized recommendations based on user behavior
+ * - Social features integration (followers, stars, etc.)
+ * - Quick access to frequently used actions
+ * 
+ * UI/UX Design:
+ * - Material 3 design system with adaptive layouts
+ * - Responsive grid system for different screen sizes
+ * - Smooth animations and transitions
+ * - Accessibility support with proper semantics
+ * - Dark/light theme support
+ * 
+ * @param onNavigateToSnippets Callback to navigate to snippets list
+ * @param onNavigateToProfile Callback to navigate to user profile
+ * @param onNavigateToAnalytics Callback to navigate to detailed analytics
+ * @param onNavigateToEvents Callback to navigate to events page
+ * @param modifier Modifier for styling and layout customization
+ * 
+ * @author Snippetia Team
+ * @since 1.0.0
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
@@ -34,34 +69,40 @@ fun DashboardScreen(
     onNavigateToEvents: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // State management for tab selection
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Overview", "Analytics", "Activity", "Recommendations")
 
+    // Main dashboard layout with full screen coverage
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // Header
+        // Dashboard header with title, navigation, and tabs
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.surface,
-            shadowElevation = 4.dp
+            shadowElevation = 4.dp // Subtle shadow for depth
         ) {
             Column {
+                // Header section with branding and welcome message
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // Dashboard icon with primary color theming
                     Icon(
                         imageVector = Icons.Default.Dashboard,
-                        contentDescription = null,
+                        contentDescription = "Dashboard",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(32.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
+                    
+                    // Title and subtitle section
                     Column {
                         Text(
                             text = "Dashboard",
@@ -76,7 +117,7 @@ fun DashboardScreen(
                     }
                 }
 
-                // Tab Row
+                // Navigation tabs for different dashboard views
                 TabRow(
                     selectedTabIndex = selectedTab,
                     modifier = Modifier.fillMaxWidth()
@@ -92,16 +133,18 @@ fun DashboardScreen(
             }
         }
 
-        // Content
+        // Dynamic content based on selected tab
         when (selectedTab) {
-            0 -> OverviewTab(
+            0 -> OverviewTab( // Main dashboard with stats, actions, and recent activity
                 onNavigateToSnippets = onNavigateToSnippets,
                 onNavigateToProfile = onNavigateToProfile,
                 onNavigateToEvents = onNavigateToEvents
             )
-            1 -> AnalyticsTab(onNavigateToAnalytics = onNavigateToAnalytics)
-            2 -> ActivityTab()
-            3 -> RecommendationsTab()
+            1 -> AnalyticsTab( // Detailed analytics and metrics
+                onNavigateToAnalytics = onNavigateToAnalytics
+            )
+            2 -> ActivityTab() // Recent activity feed and notifications
+            3 -> RecommendationsTab() // Personalized recommendations and suggestions
         }
     }
 }

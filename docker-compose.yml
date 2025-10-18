@@ -1,7 +1,39 @@
+# Snippetia Docker Compose Configuration
+# 
+# This file defines the complete infrastructure stack for the Snippetia platform.
+# It includes all necessary services for development and production deployment.
+#
+# Services:
+# - PostgreSQL: Primary database for application data
+# - Redis: Caching and session storage
+# - Backend: Spring Boot API server
+# - Nginx: Reverse proxy and load balancer
+# - Elasticsearch: Advanced search capabilities
+# - Prometheus: Metrics collection and monitoring
+# - Grafana: Dashboards and visualization
+#
+# Usage:
+# - Development: docker-compose up -d
+# - Production: docker-compose -f docker-compose.prod.yml up -d
+# - Scaling: docker-compose up -d --scale backend=3
+#
+# Network:
+# - All services communicate through a custom bridge network
+# - External access only through Nginx proxy
+# - Internal service discovery by service name
+#
+# Volumes:
+# - Persistent data storage for databases
+# - Shared file storage for uploads
+# - Configuration and log persistence
+
 version: '3.8'
 
 services:
-  # Database
+  # ===== DATABASE SERVICES =====
+  
+  # PostgreSQL - Primary database for application data
+  # Stores users, snippets, comments, analytics, and all relational data
   postgres:
     image: postgres:15-alpine
     container_name: snippetia-db
@@ -17,7 +49,8 @@ services:
     networks:
       - snippetia-network
 
-  # Redis for caching and sessions
+  # Redis - High-performance caching and session storage
+  # Used for: JWT tokens, API rate limiting, search caching, real-time features
   redis:
     image: redis:7-alpine
     container_name: snippetia-redis
@@ -28,7 +61,10 @@ services:
     networks:
       - snippetia-network
 
-  # Backend API
+  # ===== APPLICATION SERVICES =====
+  
+  # Backend API - Spring Boot application server
+  # Provides RESTful APIs, authentication, business logic, and integrations
   backend:
     build:
       context: ./backend
@@ -63,7 +99,10 @@ services:
       - snippetia-network
     restart: unless-stopped
 
-  # Nginx reverse proxy
+  # ===== INFRASTRUCTURE SERVICES =====
+  
+  # Nginx - Reverse proxy, load balancer, and static file server
+  # Handles SSL termination, request routing, and performance optimization
   nginx:
     image: nginx:alpine
     container_name: snippetia-nginx
@@ -79,7 +118,8 @@ services:
       - snippetia-network
     restart: unless-stopped
 
-  # Elasticsearch for advanced search
+  # Elasticsearch - Advanced search and analytics engine
+  # Provides full-text search, faceted search, and real-time analytics
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
     container_name: snippetia-elasticsearch
@@ -94,7 +134,10 @@ services:
     networks:
       - snippetia-network
 
-  # Monitoring with Prometheus
+  # ===== MONITORING SERVICES =====
+  
+  # Prometheus - Metrics collection and alerting
+  # Collects application metrics, system metrics, and custom business metrics
   prometheus:
     image: prom/prometheus:latest
     container_name: snippetia-prometheus
@@ -106,7 +149,8 @@ services:
     networks:
       - snippetia-network
 
-  # Grafana for dashboards
+  # Grafana - Visualization and dashboards
+  # Provides beautiful dashboards, alerting, and data exploration
   grafana:
     image: grafana/grafana:latest
     container_name: snippetia-grafana

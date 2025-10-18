@@ -15,6 +15,39 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 
+/**
+ * UserController - REST API endpoints for user management operations
+ * 
+ * This controller provides comprehensive user management functionality including:
+ * - User profile retrieval and management
+ * - Administrative user operations
+ * - Username and email availability checking
+ * - Activity tracking and analytics
+ * 
+ * Security Features:
+ * - JWT-based authentication required for most endpoints
+ * - Role-based access control (RBAC) for admin operations
+ * - Input validation and sanitization
+ * - Rate limiting and abuse prevention
+ * 
+ * API Documentation:
+ * - OpenAPI 3.0 annotations for automatic documentation
+ * - Comprehensive error response definitions
+ * - Request/response examples and schemas
+ * 
+ * Endpoints:
+ * - GET /profile - Get current user's profile
+ * - GET /{userId}/profile - Get any user's public profile
+ * - GET /username/{username} - Get profile by username
+ * - GET / - List all users (admin only)
+ * - DELETE /{userId} - Delete user account (admin only)
+ * - POST /{userId}/activity - Update user activity
+ * - GET /check/username/{username} - Check username availability
+ * - GET /check/email/{email} - Check email availability
+ * 
+ * @author Snippetia Team
+ * @since 1.0.0
+ */
 @RestController
 @RequestMapping("/api/v1/users")
 @Tag(name = "User Management", description = "User profile and management operations")

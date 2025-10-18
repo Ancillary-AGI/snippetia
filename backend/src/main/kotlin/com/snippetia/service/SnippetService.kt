@@ -16,6 +16,34 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
+/**
+ * SnippetService - Core business logic for code snippet management
+ * 
+ * This service handles all operations related to code snippets including:
+ * - CRUD operations for snippets
+ * - Security scanning and validation
+ * - Search and filtering functionality
+ * - Version control and history tracking
+ * - Social features (likes, comments, forks)
+ * - File upload and language detection
+ * 
+ * Features:
+ * - Automatic security scanning with VirusTotal integration
+ * - AI-powered language detection and code analysis
+ * - Real-time search indexing with Elasticsearch
+ * - Version control with Git-like functionality
+ * - Social interactions (likes, comments, forks)
+ * - Advanced filtering and categorization
+ * 
+ * Security:
+ * - All snippets are scanned for malicious content
+ * - User authorization checks for all operations
+ * - Input validation and sanitization
+ * - Rate limiting and abuse prevention
+ * 
+ * @author Snippetia Team
+ * @since 1.0.0
+ */
 @Service
 @Transactional
 class SnippetService(
@@ -29,6 +57,16 @@ class SnippetService(
     private val searchService: SearchService
 ) {
 
+    /**
+     * Retrieves all public code snippets with optional filtering
+     * 
+     * @param language Optional programming language filter (e.g., "kotlin", "java", "python")
+     * @param category Optional category filter (e.g., "algorithm", "ui", "backend")
+     * @param tags Optional list of tags to filter by
+     * @param search Optional search query for full-text search
+     * @param pageable Pagination parameters (page, size, sort)
+     * @return Paginated list of public snippets matching the criteria
+     */
     fun getAllPublicSnippets(
         language: String?,
         category: String?,
@@ -44,6 +82,17 @@ class SnippetService(
         return snippets.map { mapToSnippetResponse(it) }
     }
 
+    /**
+     * Retrieves a specific snippet by its ID with full details
+     * 
+     * This method also increments the view count for analytics purposes.
+     * Only public snippets can be accessed through this method.
+     * 
+     * @param id The unique identifier of the snippet
+     * @return Detailed snippet information including content, metadata, and statistics
+     * @throws ResourceNotFoundException if snippet doesn't exist
+     * @throws UnauthorizedException if snippet is private
+     */
     fun getSnippetById(id: Long): SnippetDetailResponse {
         val snippet = snippetRepository.findById(id)
             .orElseThrow { ResourceNotFoundException("Snippet not found") }
@@ -59,6 +108,21 @@ class SnippetService(
         return mapToSnippetDetailResponse(snippet)
     }
 
+    /**
+     * Creates a new code snippet
+     * 
+     * This method performs several operations:
+     * 1. Validates user existence and permissions
+     * 2. Creates the snippet entity with provided metadata
+     * 3. Performs security scanning for malicious content
+     * 4. Indexes the snippet for search functionality
+     * 
+     * @param userId The ID of the user creating the snippet
+     * @param request The snippet creation request containing title, content, language, etc.
+     * @return The created snippet with generated ID and metadata
+     * @throws ResourceNotFoundException if user doesn't exist
+     * @throws SecurityException if snippet contains malicious content
+     */
     fun createSnippet(userId: Long, request: CreateSnippetRequest): SnippetResponse {
         val user = userRepository.findById(userId)
             .orElseThrow { ResourceNotFoundException("User not found") }
@@ -86,6 +150,21 @@ class SnippetService(
         return mapToSnippetResponse(savedSnippet)
     }
 
+    /**
+     * Creates a snippet from an uploaded file
+     * 
+     * This method handles file upload and processing:
+     * 1. Reads and validates the uploaded file
+     * 2. Detects programming language from file extension if not provided
+     * 3. Extracts content and creates snippet
+     * 4. Performs security scanning and indexing
+     * 
+     * @param userId The ID of the user uploading the snippet
+     * @param request The upload request containing file and metadata
+     * @return The created snippet from the uploaded file
+     * @throws ResourceNotFoundException if user doesn't exist
+     * @throws IllegalArgumentException if file is invalid or too large
+     */
     fun uploadSnippet(userId: Long, request: UploadSnippetRequest): SnippetResponse {
         val user = userRepository.findById(userId)
             .orElseThrow { ResourceNotFoundException("User not found") }
@@ -121,6 +200,23 @@ class SnippetService(
         return mapToSnippetResponse(savedSnippet)
     }
 
+    /**
+     * Updates an existing snippet
+     * 
+     * This method provides version control functionality:
+     * 1. Validates user ownership of the snippet
+     * 2. Creates a new version if content has changed
+     * 3. Updates snippet metadata and content
+     * 4. Re-scans for security if content changed
+     * 5. Updates search index
+     * 
+     * @param userId The ID of the user updating the snippet
+     * @param snippetId The ID of the snippet to update
+     * @param request The update request with new values
+     * @return The updated snippet information
+     * @throws ResourceNotFoundException if snippet doesn't exist
+     * @throws UnauthorizedException if user doesn't own the snippet
+     */
     fun updateSnippet(userId: Long, snippetId: Long, request: UpdateSnippetRequest): SnippetResponse {
         val snippet = snippetRepository.findById(snippetId)
             .orElseThrow { ResourceNotFoundException("Snippet not found") }
@@ -156,6 +252,19 @@ class SnippetService(
         return mapToSnippetResponse(savedSnippet)
     }
 
+    /**
+     * Deletes a snippet and all associated data
+     * 
+     * This method performs cleanup operations:
+     * 1. Validates user ownership
+     * 2. Removes from search index
+     * 3. Deletes snippet and cascades to related entities (comments, likes, versions)
+     * 
+     * @param userId The ID of the user deleting the snippet
+     * @param snippetId The ID of the snippet to delete
+     * @throws ResourceNotFoundException if snippet doesn't exist
+     * @throws UnauthorizedException if user doesn't own the snippet
+     */
     fun deleteSnippet(userId: Long, snippetId: Long) {
         val snippet = snippetRepository.findById(snippetId)
             .orElseThrow { ResourceNotFoundException("Snippet not found") }
@@ -170,6 +279,18 @@ class SnippetService(
         snippetRepository.delete(snippet)
     }
 
+    /**
+     * Toggles like status for a snippet
+     * 
+     * If the user has already liked the snippet, it removes the like.
+     * If the user hasn't liked it, it adds a new like.
+     * Updates the snippet's like count accordingly.
+     * 
+     * @param userId The ID of the user toggling the like
+     * @param snippetId The ID of the snippet to like/unlike
+     * @return true if snippet is now liked, false if like was removed
+     * @throws ResourceNotFoundException if user or snippet doesn't exist
+     */
     fun toggleLike(userId: Long, snippetId: Long): Boolean {
         val user = userRepository.findById(userId)
             .orElseThrow { ResourceNotFoundException("User not found") }
@@ -193,6 +314,18 @@ class SnippetService(
         }
     }
 
+    /**
+     * Creates a fork (copy) of an existing snippet
+     * 
+     * Forking allows users to create their own version of someone else's snippet.
+     * The fork maintains a reference to the original snippet and increments
+     * the original's fork count.
+     * 
+     * @param userId The ID of the user creating the fork
+     * @param snippetId The ID of the snippet to fork
+     * @return The newly created forked snippet
+     * @throws ResourceNotFoundException if user or snippet doesn't exist
+     */
     fun forkSnippet(userId: Long, snippetId: Long): SnippetResponse {
         val user = userRepository.findById(userId)
             .orElseThrow { ResourceNotFoundException("User not found") }
